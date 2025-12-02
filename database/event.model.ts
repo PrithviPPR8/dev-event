@@ -102,40 +102,34 @@ const EventSchema = new Schema<EventDocument, EventModel>(
 );
 
 // Pre-save hook to generate slug, normalize date/time, and validate required data.
-EventSchema.pre<EventDocument>('save', function preSave(next) {
-  try {
-    // Validate required string fields at application level for clearer errors.
-    ensureNonEmpty(this.title, 'title');
-    ensureNonEmpty(this.description, 'description');
-    ensureNonEmpty(this.overview, 'overview');
-    ensureNonEmpty(this.image, 'image');
-    ensureNonEmpty(this.venue, 'venue');
-    ensureNonEmpty(this.location, 'location');
-    ensureNonEmpty(this.mode, 'mode');
-    ensureNonEmpty(this.audience, 'audience');
-    ensureNonEmpty(this.organizer, 'organizer');
+EventSchema.pre<EventDocument>('save', async function preSave() {
+  // Validate required string fields at application level for clearer errors.
+  ensureNonEmpty(this.title, 'title');
+  ensureNonEmpty(this.description, 'description');
+  ensureNonEmpty(this.overview, 'overview');
+  ensureNonEmpty(this.image, 'image');
+  ensureNonEmpty(this.venue, 'venue');
+  ensureNonEmpty(this.location, 'location');
+  ensureNonEmpty(this.mode, 'mode');
+  ensureNonEmpty(this.audience, 'audience');
+  ensureNonEmpty(this.organizer, 'organizer');
 
-    if (!Array.isArray(this.agenda) || this.agenda.length === 0) {
-      throw new Error('Field "agenda" is required and cannot be empty');
-    }
-
-    if (!Array.isArray(this.tags) || this.tags.length === 0) {
-      throw new Error('Field "tags" is required and cannot be empty');
-    }
-
-    // Only regenerate slug if the title has changed.
-    if (this.isModified('title') || !this.slug) {
-      this.slug = generateSlug(this.title);
-    }
-
-    // Normalize date and time to consistent formats.
-    this.date = normalizeDateToISO(this.date);
-    this.time = normalizeTime(this.time);
-
-    next();
-  } catch (err) {
-    next(err as Error);
+  if (!Array.isArray(this.agenda) || this.agenda.length === 0) {
+    throw new Error('Field "agenda" is required and cannot be empty');
   }
+
+  if (!Array.isArray(this.tags) || this.tags.length === 0) {
+    throw new Error('Field "tags" is required and cannot be empty');
+  }
+
+  // Only regenerate slug if the title has changed.
+  if (this.isModified('title') || !this.slug) {
+    this.slug = generateSlug(this.title);
+  }
+
+  // Normalize date and time to consistent formats.
+  this.date = normalizeDateToISO(this.date);
+  this.time = normalizeTime(this.time);
 });
 
 // Re-use existing model in development to avoid OverwriteModelError.
