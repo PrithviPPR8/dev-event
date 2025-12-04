@@ -38,9 +38,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: 'Event created successfully', event: createdEvent }, { status: 201 });
     } catch (e) {
         console.error(e);
-        return NextResponse.json({ message: "Event creation failed", error: e instanceof Error ? e.message : "Unknown" }, { status: 500 });
-    }
-}
+        // Log full error server-side; return generic message to client
+        console.error('Event creation error:', e);
+        return NextResponse.json({ message: "Event creation failed" }, { status: 500 });
+    }}
 
 export async function GET() {
     try {

@@ -1,3 +1,4 @@
+import BookEvent from "@/components/BookEvent";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -33,9 +34,22 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }>}
 
   const { slug } = await params;
   const request = await fetch(`${BASE_URL}/api/events/${slug}`);
-  const { event: { description, image, overview, date, time, location, mode, agenda, audience, tags, organizer} } = await request.json();
-
+  
+  if (!request.ok) {
+    return notFound();
+  }
+  
+  const data = await request.json();
+  const { event } = data;
+  
+  if (!event) {
+    return notFound();
+  }
+  
+  const { description, image, overview, date, time, location, mode, agenda, audience, tags, organizer } = event;
   if(!description) return notFound();
+
+  const bookings = 10;
 
   return (
     <section id="event">
@@ -82,7 +96,18 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }>}
 
         {/* Right Side - Booking Form */}
         <aside className="booking">
-          <p className="text-lg font-semibold">Book Event</p>
+          <div className="signup-card">
+            <h2>Book Your Spot</h2>
+            {bookings > 0 ? (
+              <p className="text-sm">
+                Join {bookings} people who have already booked their spot!
+              </p>
+            ): (
+              <p className="text-sm">Be the first to book your spot!</p>
+            )}
+
+            <BookEvent />
+          </div>
         </aside>
       </div>
     </section>
