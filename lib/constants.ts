@@ -1,66 +1,69 @@
-export interface Event {
-  id: string;
-  title: string;
+export type EventItem = {
   image: string;
+  title: string;
   slug: string;
   location: string;
-  date: string;
-  time: string;
-}
+  date: string; // e.g., "2025-11-07"
+  time: string; // e.g., "09:00 AM"
+};
 
-export const events: Event[] = [
+export const events: EventItem[] = [
   {
-    id: "1",
-    title: "React Summit 2025",
     image: "/images/event1.png",
-    slug: "react-summit-2025",
-    location: "Amsterdam, Netherlands",
-    date: "June 3-4, 2025",
+    title: "React Summit US 2025",
+    slug: "react-summit-us-2025",
+    location: "San Francisco, CA, USA",
+    date: "2025-11-07",
     time: "09:00 AM",
   },
   {
-    id: "2",
-    title: "Next.js Conf 2025",
     image: "/images/event2.png",
-    slug: "nextjs-conf-2025",
-    location: "San Francisco, CA",
-    date: "September 23-24, 2025",
-    time: "08:30 AM",
-  },
-  {
-    id: "3",
-    title: "Web3 Developer Summit",
-    image: "/images/event3.png",
-    slug: "web3-dev-summit",
-    location: "Singapore",
-    date: "July 15-17, 2025",
+    title: "KubeCon + CloudNativeCon Europe 2026",
+    slug: "kubecon-cloudnativecon-eu-2026",
+    location: "Vienna, Austria",
+    date: "2026-03-18",
     time: "10:00 AM",
   },
   {
-    id: "4",
-    title: "JavaScript Annual Hackathon",
+    image: "/images/event3.png",
+    title: "AWS re:Invent 2025",
+    slug: "aws-reinvent-2025",
+    location: "Las Vegas, NV, USA",
+    date: "2025-12-01",
+    time: "08:30 AM",
+  },
+  {
     image: "/images/event4.png",
-    slug: "js-hackathon-2025",
-    location: "Berlin, Germany",
-    date: "August 10-11, 2025",
+    title: "Next.js Conf 2025",
+    slug: "nextjs-conf-2025",
+    location: "Los Angeles, CA, USA (Hybrid)",
+    date: "2025-11-12",
+    time: "09:30 AM",
+  },
+  {
+    image: "/images/event5.png",
+    title: "Google Cloud Next 2026",
+    slug: "google-cloud-next-2026",
+    location: "San Jose, CA, USA",
+    date: "2026-04-07",
     time: "09:00 AM",
   },
   {
-    id: "5",
-    title: "TypeScript Advanced Workshop",
-    image: "/images/event5.png",
-    slug: "typescript-workshop",
-    location: "London, UK",
-    date: "May 20-21, 2025",
-    time: "02:00 PM",
+    image: "/images/event6.png",
+    title: "ETHGlobal Hackathon: Paris 2026",
+    slug: "ethglobal-paris-2026",
+    location: "Paris, France",
+    date: "2026-07-10",
+    time: "10:00 AM",
   },
   {
-    id: "6",
-    title: "Full Stack Development Summit",
-    image: "/images/event6.png",
-    slug: "fullstack-summit",
-    location: "Austin, TX",
-    date: "October 8-9, 2025",
+    image: "/images/events-full.png",
+    title: "Open Source Summit North America 2026",
+    slug: "oss-na-2026",
+    location: "Vancouver, Canada",
+    date: "2026-06-22",
     time: "09:00 AM",
   },
 ];
+
+export default events;
