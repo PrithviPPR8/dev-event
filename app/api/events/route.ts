@@ -2,9 +2,25 @@ import { Event } from "@/database";
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { cookies } from "next/headers";
+import { verifyAdminToken } from "@/lib/auth";
+
 
 export async function POST(req: NextRequest) {
     try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("admin-token")?.value;
+
+        if (!token) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const payload = verifyAdminToken(token);
+
+        if (!payload || payload.role !== "admin") {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+        }
+
         await connectToDatabase();
 
         const formData = await req.formData();
