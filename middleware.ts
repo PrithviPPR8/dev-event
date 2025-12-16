@@ -2,20 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("admin-token")?.value;
+  const { pathname } = req.nextUrl;
 
-  const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
-
-  if (!isAdminRoute) return NextResponse.next();
-
-  if (!token) {
-    return NextResponse.redirect(new URL("/admin/login", req.url));
+  // ✅ Allow login page WITHOUT auth
+  if (pathname === "/admin/login") {
+    return NextResponse.next();
   }
 
-  const payload = verifyAdminToken(token);
+  // 🔒 Protect all other admin routes
+  if (pathname.startsWith("/admin")) {
+    const token = req.cookies.get("admin-token")?.value;
 
-  if (!payload || payload.role !== "admin") {
-    return NextResponse.redirect(new URL("/admin/login", req.url));
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
+
+    const payload = verifyAdminToken(token);
+
+    if (!payload || payload.role !== "admin") {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
   }
 
   return NextResponse.next();
