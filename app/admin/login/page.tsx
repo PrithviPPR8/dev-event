@@ -39,13 +39,13 @@ const AdminLoginPage = () => {
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center">
+    <section className="flex items-center justify-center py-20">
       <div className="w-full max-w-md border rounded-lg p-6">
         <h1 className="text-2xl font-semibold text-center mb-6">
           Admin Login
         </h1>
 
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Username"
@@ -62,11 +62,18 @@ const AdminLoginPage = () => {
             className="border px-3 py-2 rounded"
           />
 
+          {error && (
+            <p className="text-red-600 text-sm text-center">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="bg-black text-white py-2 rounded"
+            disabled={loading}
+            className="bg-black text-white py-2 rounded disabled:opacity-50"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
