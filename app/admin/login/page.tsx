@@ -17,7 +17,7 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('api/admin/login', {
+      const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -30,7 +30,9 @@ const AdminLoginPage = () => {
         throw new Error(data.message || 'Login Failed');
       }
 
-      router.push('/admin/dashboard');
+      console.log('Login success, redirecting...');
+      window.location.href = '/admin/dashboard';
+      // window.location.href = '/admin/login?test=1';
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -71,7 +73,7 @@ const AdminLoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-black text-white py-2 rounded disabled:opacity-50"
+            className="bg-black text-white py-2 rounded disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
