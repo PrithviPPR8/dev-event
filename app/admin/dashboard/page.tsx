@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type EventItem = {
   _id: string;
@@ -11,6 +12,8 @@ type EventItem = {
 };
 
 const AdminDashboardPage = () => {
+  const router = useRouter();
+
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,13 +35,29 @@ const AdminDashboardPage = () => {
     fetchEvents();
   }, [])
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', {
+        method: "POST",
+      });
+
+      //Force full navigation
+      window.location.href = '/admin/login';
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  }
+
   return (
     <section className="px-8 py-6">
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-8">
         <h1 >Admin Dashboard</h1>
 
-        <button className="border px-4 py-2 rounded">
+        <button 
+          onClick={handleLogout}
+          className="border px-4 py-2 rounded cursor-pointer"
+        >
           Logout
         </button>
       </div>
