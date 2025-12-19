@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Modal from '@/components/Modal';
+import EventForm from '@/components/EventForm';
 
 type EventItem = {
   _id: string;
@@ -16,6 +18,8 @@ const AdminDashboardPage = () => {
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -48,6 +52,28 @@ const AdminDashboardPage = () => {
     }
   }
 
+  const handleCreateEvent = async (formData: FormData) => {
+    try {
+      setFormLoading(true);
+
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to create event');
+      }
+
+      setIsModalOpen(false);
+      window.location.reload(); // simple refresh for now
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <section className="px-8 py-6">
       {/* Top Bar */}
@@ -64,7 +90,10 @@ const AdminDashboardPage = () => {
 
       {/* Actions */}
       <div className="mb-6">
-        <button className="bg-black text-white border px-4 py-2 rounded">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-black text-white border px-4 py-2 rounded"
+        >
           + Create Event
         </button>
       </div>
@@ -106,6 +135,18 @@ const AdminDashboardPage = () => {
           ))
         )}
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Create Event"
+      >
+        <EventForm
+          onSubmit={handleCreateEvent}
+          onCancel={() => setIsModalOpen(false)}
+          loading={formLoading}
+        />
+      </Modal>
     </section>
   );
 };
