@@ -18,7 +18,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-lg">✕</button>
+          <button onClick={onClose} className="text-lg cursor-pointer">✕</button>
         </div>
 
         {/* Content */}

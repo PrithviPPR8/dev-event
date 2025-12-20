@@ -1,6 +1,10 @@
 import { connectToDatabase } from '@/lib/mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import Event, { IEvent } from '@/database/event.model';
+import { v2 as cloudinary } from "cloudinary";
+import { cookies } from "next/headers";
+import { verifyAdminToken } from "@/lib/auth";
+
 
 // Define route params type for type safety
 type RouteParams = {
@@ -77,6 +81,100 @@ export async function GET(
     // Handle unknown errors
     return NextResponse.json(
       { message: 'An unexpected error occurred' },
+      { status: 500 }
+    );
+  }
+}
+
+
+/**
+ * PUT /api/events/[slug]
+ * Update an existing event (Admin only)
+ */
+export async function PUT(
+  req: NextRequest,
+  { params }: RouteParams
+): Promise<NextResponse> {
+  try {
+    // 🔐 Admin auth
+    const cookieStore = await cookies();
+    const token = cookieStore.get("admin-token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = verifyAdminToken(token);
+    if (!payload || payload.role !== "admin") {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    await connectToDatabase();
+
+    // Get slug
+    const { slug } = await params;
+    if (!slug) {
+      return NextResponse.json(
+        { message: "Missing slug parameter" },
+        { status: 400 }
+      );
+    }
+
+    const existingEvent = await Event.findOne({ slug });
+    if (!existingEvent) {
+      return NextResponse.json(
+        { message: "Event not found" },
+        { status: 404 }
+      );
+    }
+
+    // Parse form data
+    const formData = await req.formData();
+    const updates = Object.fromEntries(formData.entries());
+
+    // Parse agenda & tags
+    const agenda = JSON.parse(formData.get("agenda") as string);
+    const tags = JSON.parse(formData.get("tags") as string);
+
+    // 🖼️ Image upload (optional)
+    const file = formData.get("image") as File | null;
+
+    if (file && file.size > 0) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const uploadResult = await new Promise<{ secure_url: string }>(
+        (resolve, reject) => {
+          cloudinary.uploader.upload_stream(
+            { resource_type: "image", folder: "DevEvent" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result as { secure_url: string });
+            }
+          ).end(buffer);
+        }
+      );
+
+      updates.image = uploadResult.secure_url;
+    }
+
+    // Apply updates
+    Object.assign(existingEvent, {
+      ...updates,
+      agenda,
+      tags,
+    });
+
+    await existingEvent.save();
+
+    return NextResponse.json(
+      { message: "Event updated successfully", event: existingEvent },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Event update error:", error);
+    return NextResponse.json(
+      { message: "Event update failed" },
       { status: 500 }
     );
   }

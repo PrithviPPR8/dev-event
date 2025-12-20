@@ -20,6 +20,8 @@ const AdminDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -74,6 +76,40 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const handleEditEvent = async (formData: FormData) => {
+    if (!selectedEvent) return;
+
+    try {
+      setFormLoading(true);
+
+      const res = await fetch(`/api/events/${selectedEvent.slug}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update event');
+      }
+
+      const updated = await res.json();
+
+      // Update dashboard list without reload
+      setEvents((prev) =>
+        prev.map((e) =>
+          e._id === updated.event._id ? updated.event : e
+        )
+      );
+
+      setIsModalOpen(false);
+      setSelectedEvent(null);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+
   return (
     <section className="px-8 py-6">
       {/* Top Bar */}
@@ -126,7 +162,16 @@ const AdminDashboardPage = () => {
               <span>{event.time}</span>
 
               <div className="flex gap-2">
-                <button className="text-sm underline cursor-pointer">Edit</button>
+                <button 
+                  className="text-sm underline cursor-pointer"
+                  onClick={() => {
+                    setSelectedEvent(event);
+                    setMode('edit');
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Edit
+                </button>
                 <button className="text-sm text-red-600 underline cursor-pointer">
                   Delete
                 </button>
@@ -138,12 +183,19 @@ const AdminDashboardPage = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Create Event"
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        title={mode === 'create' ? 'Create Event' : 'Edit Event'}
       >
         <EventForm
-          onSubmit={handleCreateEvent}
-          onCancel={() => setIsModalOpen(false)}
+          initialData={mode === 'edit' ? selectedEvent : undefined}
+          onSubmit={mode === 'create' ? handleCreateEvent : handleEditEvent}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setSelectedEvent(null);
+          }}
           loading={formLoading}
         />
       </Modal>
