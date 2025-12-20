@@ -126,8 +126,8 @@ const AdminDashboardPage = () => {
               <span>{event.time}</span>
 
               <div className="flex gap-2">
-                <button className="text-sm underline">Edit</button>
-                <button className="text-sm text-red-600 underline">
+                <button className="text-sm underline cursor-pointer">Edit</button>
+                <button className="text-sm text-red-600 underline cursor-pointer">
                   Delete
                 </button>
               </div>

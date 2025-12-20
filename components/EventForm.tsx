@@ -71,6 +71,7 @@ const EventForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <label className="text-sm text-neutral-300">Event Title</label>
       <input
         type="text"
         placeholder="Title"
@@ -80,8 +81,9 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Description</label>
       <textarea
-        placeholder="Short description"
+        placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         className="border px-3 py-2 rounded"
@@ -89,6 +91,7 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Overview</label>
       <textarea
         placeholder="Overview"
         value={overview}
@@ -98,6 +101,7 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Venue</label>
       <input
         type="text"
         placeholder="Venue"
@@ -107,6 +111,7 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Location</label>
       <input
         type="text"
         placeholder="Location"
@@ -116,6 +121,7 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Date</label>
       <div className="flex gap-3">
         <input
           type="date"
@@ -125,6 +131,7 @@ const EventForm = ({
           required
         />
 
+        <label className="text-sm text-neutral-300">Event Time</label>
         <input
           type="time"
           value={time}
@@ -134,16 +141,24 @@ const EventForm = ({
         />
       </div>
 
+      <label className="text-sm text-neutral-300">Mode of Event</label>
       <select
         value={mode}
         onChange={(e) => setMode(e.target.value)}
         className="border px-3 py-2 rounded"
       >
-        <option value="online">Online</option>
-        <option value="offline">Offline</option>
-        <option value="hybrid">Hybrid</option>
+        <option value="online" className='bg-neutral-900 text-white'>
+          Online
+        </option>
+        <option value="offline" className='bg-neutral-900 text-white'>
+          Offline
+          </option>
+        <option value="hybrid" className='bg-neutral-900 text-white'>
+          Hybrid
+        </option>
       </select>
 
+      <label className="text-sm text-neutral-300">Type of audience</label>
       <input
         type="text"
         placeholder="Audience"
@@ -153,8 +168,9 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Agenda</label>
       <textarea
-        placeholder="Agenda (one item per line)"
+        placeholder="Agenda (one item per line). Example - 08:45 AM - 09:45 AM | Keynote: AI in Cyber Defense"
         value={agenda}
         onChange={(e) => setAgenda(e.target.value)}
         className="border px-3 py-2 rounded"
@@ -162,8 +178,9 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Tags</label>
       <textarea
-        placeholder="Tags (one per line)"
+        placeholder="Tags (one per line). Exmplae - React, Next.js, Frontend, Cloud, Security, etc"
         value={tags}
         onChange={(e) => setTags(e.target.value)}
         className="border px-3 py-2 rounded"
@@ -171,6 +188,7 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Organizer</label>
       <textarea
         placeholder="Organizer info"
         value={organizer}
@@ -180,18 +198,32 @@ const EventForm = ({
         required
       />
 
+      <label className="text-sm text-neutral-300">Event Image</label>
       <input
         type="file"
         accept="image/*"
         onChange={(e) => setImage(e.target.files?.[0] || null)}
         required={!initialData}
+        className="
+          file:mr-4 
+          file:py-2 
+          file:px-4 
+          file:rounded 
+          file:border-0 
+          file:bg-neutral-800 
+          file:text-white 
+          file:cursor-pointer
+          file:hover:bg-neutral-700
+          text-neutral-400
+          cursor-pointer
+        "
       />
 
       <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
           onClick={onCancel}
-          className="border px-4 py-2 rounded"
+          className="border px-4 py-2 rounded cursor-pointer"
         >
           Cancel
         </button>
@@ -199,7 +231,7 @@ const EventForm = ({
         <button
           type="submit"
           disabled={loading}
-          className="bg-black text-white px-4 py-2 rounded"
+          className="bg-black text-white px-4 py-2 rounded cursor-pointer"
         >
           {loading ? 'Saving...' : 'Save Event'}
         </button>
