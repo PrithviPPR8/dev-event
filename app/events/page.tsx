@@ -14,28 +14,39 @@ type EventItem = {
 const EventsPage = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/events', {
-          cache: 'no-store',
-        });
+        try {
+        const res = await fetch(
+            `/api/events?search=${encodeURIComponent(search)}`,
+            { cache: 'no-store' }
+        );
         const data = await res.json();
         setEvents(data.events || []);
-      } catch (error) {
+        } catch (error) {
         console.error('Failed to fetch events', error);
-      } finally {
+        } finally {
         setLoading(false);
-      }
+        }
     };
 
     fetchEvents();
-  }, []);
+  }, [search]);
+
 
   return (
     <section className="px-8 py-6">
       <h1 className="mb-8">All Events</h1>
+
+      <input
+        type="text"
+        placeholder="Search events by title, audience, or tags"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-6 w-full max-w-md border px-3 py-2 rounded"
+      />
 
       <div className="border rounded-lg">
         <div className="grid grid-cols-6 font-medium border-b px-4 py-2">

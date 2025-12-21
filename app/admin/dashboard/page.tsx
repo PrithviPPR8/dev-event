@@ -23,13 +23,15 @@ const AdminDashboardPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [eventToDelete, setEventToDelete] = useState<EventItem | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('/api/events', {
-          cache: 'no-store',
-        });
+        const res = await fetch(
+          `/api/events?search=${encodeURIComponent(search)}`,
+          { cache: 'no-store' }
+        );
         const data = await res.json();
         setEvents(data.events || []);
       } catch (error) {
@@ -40,7 +42,7 @@ const AdminDashboardPage = () => {
     };
 
     fetchEvents();
-  }, [])
+  }, [search])
 
   const handleLogout = async () => {
     try {
@@ -110,30 +112,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const handleDeleteEvent = async (event: EventItem) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${event.title}"?`
-    );
-
-    if (!confirmed) return;
-
-    try {
-      const res = await fetch(`/api/events/${event.slug}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to delete event');
-      }
-
-      // Remove event from state
-      setEvents((prev) => prev.filter((e) => e._id !== event._id));
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete event');
-    }
-  };
-
   const confirmDeleteEvent = async () => {
     if (!eventToDelete) return;
 
@@ -181,6 +159,14 @@ const AdminDashboardPage = () => {
           + Create Event
         </button>
       </div>
+
+      <input
+        type="text"
+        placeholder="Search events..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-4 w-full max-w-sm border px-3 py-2 rounded"
+      />
 
       {/* Events List */}
       <div className="border rounded-lg">
