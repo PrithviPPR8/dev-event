@@ -109,6 +109,30 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const handleDeleteEvent = async (event: EventItem) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${event.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/events/${event.slug}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete event');
+      }
+
+      // Remove event from state
+      setEvents((prev) => prev.filter((e) => e._id !== event._id));
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete event');
+    }
+  };
+
 
   return (
     <section className="px-8 py-6">
@@ -172,7 +196,10 @@ const AdminDashboardPage = () => {
                 >
                   Edit
                 </button>
-                <button className="text-sm text-red-600 underline cursor-pointer">
+                <button
+                  className="text-sm text-red-600 underline cursor-pointer"
+                  onClick={() => handleDeleteEvent(event)}
+                >
                   Delete
                 </button>
               </div>

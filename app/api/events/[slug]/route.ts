@@ -179,3 +179,61 @@ export async function PUT(
     );
   }
 }
+
+
+/**
+ * DELETE /api/events/[slug]
+ * Delete an event (Admin only)
+ */
+export async function DELETE(
+  req: NextRequest,
+  { params }: RouteParams
+): Promise<NextResponse> {
+  try {
+    // 🔐 Admin auth
+    const cookieStore = await cookies();
+    const token = cookieStore.get("admin-token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = verifyAdminToken(token);
+    if (!payload || payload.role !== "admin") {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    await connectToDatabase();
+
+    // Get slug
+    const { slug } = await params;
+    if (!slug) {
+      return NextResponse.json(
+        { message: "Missing slug parameter" },
+        { status: 400 }
+      );
+    }
+
+    const event = await Event.findOne({ slug });
+    if (!event) {
+      return NextResponse.json(
+        { message: "Event not found" },
+        { status: 404 }
+      );
+    }
+
+    await event.deleteOne();
+
+    return NextResponse.json(
+      { message: "Event deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Event delete error:", error);
+    return NextResponse.json(
+      { message: "Event deletion failed" },
+      { status: 500 }
+    );
+  }
+}
+
