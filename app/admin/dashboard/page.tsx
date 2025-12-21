@@ -22,6 +22,7 @@ const AdminDashboardPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('create');
+  const [eventToDelete, setEventToDelete] = useState<EventItem | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -133,6 +134,29 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+
+    try {
+      const res = await fetch(`/api/events/${eventToDelete.slug}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete event');
+      }
+
+      // Remove from UI
+      setEvents((prev) =>
+        prev.filter((e) => e._id !== eventToDelete._id)
+      );
+
+      setEventToDelete(null);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete event');
+    }
+  };
 
   return (
     <section className="px-8 py-6">
@@ -198,7 +222,7 @@ const AdminDashboardPage = () => {
                 </button>
                 <button
                   className="text-sm text-red-600 underline cursor-pointer"
-                  onClick={() => handleDeleteEvent(event)}
+                  onClick={() => setEventToDelete(event)}
                 >
                   Delete
                 </button>
@@ -225,6 +249,42 @@ const AdminDashboardPage = () => {
           }}
           loading={formLoading}
         />
+      </Modal>
+
+      <Modal
+        isOpen={!!eventToDelete}
+        onClose={() => setEventToDelete(null)}
+        title="Delete Event"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-neutral-300">
+            Are you sure you want to delete
+            <span className="font-semibold text-white">
+              {" "}{eventToDelete?.title}
+            </span>
+            ?
+          </p>
+
+          <p className="text-sm text-neutral-400">
+            This action cannot be undone.
+          </p>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              onClick={() => setEventToDelete(null)}
+              className="border px-4 py-2 rounded cursor-pointer"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={confirmDeleteEvent}
+              className="bg-red-600 text-white px-4 py-2 rounded cursor-pointer"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
     </section>
   );
