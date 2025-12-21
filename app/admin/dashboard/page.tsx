@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';
 import EventForm from '@/components/EventForm';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type EventItem = {
   _id: string;
@@ -25,24 +26,27 @@ const AdminDashboardPage = () => {
   const [eventToDelete, setEventToDelete] = useState<EventItem | null>(null);
   const [search, setSearch] = useState('');
 
+  const debouncedSearch = useDebounce(search, 300);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const res = await fetch(
-          `/api/events?search=${encodeURIComponent(search)}`,
+          `/api/events?search=${encodeURIComponent(debouncedSearch)}`,
           { cache: 'no-store' }
         );
         const data = await res.json();
         setEvents(data.events || []);
       } catch (error) {
-        console.error("Failed to fetch events", error);
+        console.error('Failed to fetch events', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchEvents();
-  }, [search])
+  }, [debouncedSearch]);
+
 
   const handleLogout = async () => {
     try {

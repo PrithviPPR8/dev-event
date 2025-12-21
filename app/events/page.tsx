@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type EventItem = {
   _id: string;
@@ -16,24 +17,27 @@ const EventsPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  const debouncedSearch = useDebounce(search, 300);
+
   useEffect(() => {
     const fetchEvents = async () => {
-        try {
+      try {
         const res = await fetch(
-            `/api/events?search=${encodeURIComponent(search)}`,
-            { cache: 'no-store' }
+          `/api/events?search=${encodeURIComponent(debouncedSearch)}`,
+          { cache: 'no-store' }
         );
         const data = await res.json();
         setEvents(data.events || []);
-        } catch (error) {
+      } catch (error) {
         console.error('Failed to fetch events', error);
-        } finally {
+      } finally {
         setLoading(false);
-        }
+      }
     };
 
     fetchEvents();
-  }, [search]);
+  }, [debouncedSearch]);
+
 
 
   return (
